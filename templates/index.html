@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Student Marks Analyzer | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">S</div>
+          <div>
+            <h2>STUDENT<span>PRO</span></h2>
+            <p>Management System</p>
+          </div>
+        </div>
+
+        <div class="sidebar-label">MENU</div>
+
+        <nav class="navigation">
+          <a href="#dashboard" class="nav-link active">
+            <span class="nav-icon">▦</span>
+            Dashboard
+          </a>
+
+          <a href="#add-student" class="nav-link">
+            <span class="nav-icon">＋</span>
+            Add Student
+          </a>
+
+          <a href="#student-records" class="nav-link">
+            <span class="nav-icon">▤</span>
+            Student Records
+          </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-profile">
+            <div class="profile-avatar">SA</div>
+            <div>
+              <h4>Administrator</h4>
+              <p>Management Panel</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div>
+            <p class="breadcrumb">Workspace / Dashboard</p>
+            <h1>Student Dashboard</h1>
+          </div>
+
+          <div class="topbar-right">
+            <div class="status-indicator">
+              <span></span>
+              System Online
+            </div>
+
+            <div class="topbar-avatar">SA</div>
+          </div>
+        </header>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert {{ category }}">
+          <span>
+            {% if category == "success" %} ✓ {% else %} ! {% endif %}
+          </span>
+          {{ message }}
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="dashboard-section">
+          <div class="section-heading">
+            <div>
+              <h2>Overview</h2>
+              <p>Here's what's happening with your students.</p>
+            </div>
+          </div>
+
+          <!-- STATISTICS CARDS -->
+          <div class="stats-grid">
+            <div class="stat-card blue-card">
+              <div class="stat-top">
+                <span>Total Students</span>
+                <div class="stat-icon">♙</div>
+              </div>
+
+              <h2>{{ total_students }}</h2>
+              <p>Registered students</p>
+
+              <div class="stat-decoration"></div>
+            </div>
+
+            <div class="stat-card purple-card">
+              <div class="stat-top">
+                <span>Class Average</span>
+                <div class="stat-icon">▥</div>
+              </div>
+
+              <h2>{{ class_average }}<small>%</small></h2>
+              <p>Overall class performance</p>
+
+              <div class="stat-decoration"></div>
+            </div>
+
+            <div class="stat-card green-card">
+              <div class="stat-top">
+                <span>Class Topper</span>
+                <div class="stat-icon">♛</div>
+              </div>
+
+              {% if topper %}
+              <h2 class="topper-name">{{ topper.name }}</h2>
+              <p>Roll No: {{ topper.roll_number }} · {{ topper.total }}/500</p>
+              {% else %}
+              <h2 class="topper-name">No Data</h2>
+              <p>Waiting for student records</p>
+              {% endif %}
+
+              <div class="stat-decoration"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ADD STUDENT -->
+        <section id="add-student" class="content-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Add New Student</h2>
+              <p>Enter student information and subject marks.</p>
+            </div>
+
+            <div class="panel-icon">＋</div>
+          </div>
+
+          <form method="POST" action="{{ url_for('home') }}">
+            <div class="form-grid">
+              <div class="input-group">
+                <label>Student Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label>Roll Number</label>
+                <input
+                  type="text"
+                  name="roll_number"
+                  placeholder="Enter roll number"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="marks-heading">
+              <h3>Subject Marks</h3>
+              <span>Maximum 100 marks per subject</span>
+            </div>
+
+            <div class="form-grid marks-grid">
+              <div class="input-group">
+                <label>English</label>
+                <input
+                  type="number"
+                  name="english"
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="0 - 100"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label>Tamil</label>
+                <input
+                  type="number"
+                  name="tamil"
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="0 - 100"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label>Mathematics</label>
+                <input
+                  type="number"
+                  name="maths"
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="0 - 100"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label>Science</label>
+                <input
+                  type="number"
+                  name="science"
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="0 - 100"
+                  required
+                />
+              </div>
+
+              <div class="input-group">
+                <label>Social Science</label>
+                <input
+                  type="number"
+                  name="social"
+                  min="0"
+                  max="100"
+                  step="any"
+                  placeholder="0 - 100"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="reset" class="reset-button">Clear Form</button>
+
+              <button type="submit" class="submit-button">
+                <span>＋</span> Add Student
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- STUDENT RECORDS -->
+        <section id="student-records" class="content-panel records-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Student Records</h2>
+              <p>View and manage all registered students.</p>
+            </div>
+
+            <div class="record-count">{{ total_students }} Records</div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>RANK</th>
+                  <th>STUDENT</th>
+                  <th>ROLL NUMBER</th>
+                  <th>TOTAL MARKS</th>
+                  <th>AVERAGE</th>
+                  <th>GRADE</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for student in students %}
+
+                <tr>
+                  <td>
+                    <div class="rank-number">{{ loop.index }}</div>
+                  </td>
+
+                  <td>
+                    <div class="student-info">
+                      <div class="student-avatar">
+                        {{ student.name[0]|upper }}
+                      </div>
+
+                      <span>{{ student.name }}</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="roll-number"> {{ student.roll_number }} </span>
+                  </td>
+
+                  <td>
+                    <strong>{{ student.total }}/500</strong>
+                  </td>
+
+                  <td>{{ "%.2f"|format(student.average) }}%</td>
+
+                  <td>
+                    <span
+                      class="grade grade-{{ student.grade|lower|replace('+', 'plus') }}"
+                    >
+                      {{ student.grade }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <form
+                      method="POST"
+                      action="{{ url_for('delete_student', student_id=student.id) }}"
+                      onsubmit="
+                        return confirm(
+                          'Are you sure you want to delete this student?',
+                        );
+                      "
+                    >
+                      <button type="submit" class="delete-button">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                  <td colspan="7" class="empty-state">
+                    <div class="empty-icon">▤</div>
+                    <h3>No Student Records</h3>
+                    <p>Add your first student using the form above.</p>
+                  </td>
+                </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+          <p>© 2026 StudentPro · Student Marks Analyzer</p>
+          <p>Powered by Python, Flask & SQLite</p>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
